@@ -413,6 +413,21 @@
     });
   }
 
+  // True when an object carries at least one real value.  Used to decide
+  // whether a mandataire (representative) was actually provided.
+  function hasContent(value) {
+    if (!value || typeof value !== 'object') return false;
+    for (var key in value) {
+      if (!Object.prototype.hasOwnProperty.call(value, key)) continue;
+      var item = value[key];
+      if (item == null) continue;
+      if (typeof item === 'string' && item.trim() === '') continue;
+      if (Array.isArray(item) && item.length === 0) continue;
+      return true;
+    }
+    return false;
+  }
+
   // Width of a logical line once shaped and reordered for drawing.
   function measureLine(text, size) {
     var rendered = renderText(text);
@@ -1023,12 +1038,20 @@
     var pages = pdf.getPages();
     if (pages.length < 4) throw new Error('The PDF template is incomplete (4 pages expected).');
 
+    // Page 2 is the representative/signatory sheet; it is only kept when a
+    // mandataire was actually filled in.
+    var withMandataire = hasContent(mandataire);
+
     paintTitulaire(pages[0], titulaire, bureaux);
-    if (mandataire && typeof mandataire === 'object' && Object.keys(mandataire).length) {
+    if (withMandataire) {
       paintMandataire(pages[1], mandataire, titulaire, bureaux);
     }
     paintArabicPage(pages[2], titulaire);
     paintPage4(pages[3], titulaire);
+
+    if (!withMandataire) {
+      pdf.removePage(1);
+    }
 
     // Append the one-page Arabic withdrawal-authorisation form (CH6).
     if (global.KYC_CH6_PDF_BASE64) {
@@ -1037,7 +1060,7 @@
       });
       var ch6Pages = await pdf.copyPages(ch6Doc, [0]);
       pdf.addPage(ch6Pages[0]);
-      paintCh6(ch6Pages[0], titulaire, mandataire, bureaux);
+      paintCh6(ch6Pages[0], titulaire, withMandataire ? mandataire : null, bureaux);
     }
 
     pdf.setTitle('');
