@@ -194,6 +194,20 @@
   var P3_CP_Y = 44.48;
   var P3_CP_STEP = 14.18;
 
+  // Right edges of the dotted leaders, so long values shrink to fit instead of
+  // running past the field.  Page 3 "Adresse actuelle" has a second, wider
+  // continuation line; long addresses wrap onto it.
+  var P1_ADDR_WIDTH = 478.70; // x = 69.0, leader ends at 547.70
+  var P2_ADDR_WIDTH = 377.70; // x = 170.0, leader ends at 547.70
+  var P3_ADDR_LINES = [
+    [495.0, 201.48, 296.16], // x, baseline, width (leader 494.74 -> 791.16)
+    [435.4, 184.48, 407.38]  // continuation line (leader 435.40 -> 842.78)
+  ];
+  var P3_INTITULE_ADDR_LINES = [
+    [478.0, 62.48, 350.02], // x, baseline, width (leader 475.29 -> 828.02)
+    [445.74, 44.48, 261.65] // continuation line, ends before "Code postal"
+  ];
+
   var P4_TEXT = {
     profession: [84.0, 536.28],
     date_signature: [303.0, 103.48]
@@ -399,6 +413,129 @@
     });
   }
 
+  // Width of a logical line once shaped and reordered for drawing.
+  function measureLine(text, size) {
+    var rendered = renderText(text);
+    if (!rendered.text) return 0;
+    var font = rendered.arabic ? state.arabicFont : state.helvetica;
+    return font.widthOfTextAtSize(rendered.text, size);
+  }
+
+  // Draw a single-line value, shrinking it (down to minSize) so it stays
+  // inside maxWidth.  Used for addresses that must never overflow the form.
+  function drawFit(page, x, y, value, maxWidth, size, minSize) {
+    var rendered = renderText(value);
+    if (!rendered.text) return;
+    var font = rendered.arabic ? state.arabicFont : state.helvetica;
+    var current = size == null ? 9 : size;
+    var floor = minSize == null ? 6.5 : minSize;
+    while (current > floor && font.widthOfTextAtSize(rendered.text, current) > maxWidth) {
+      current -= 0.25;
+    }
+    page.drawText(rendered.text, {
+      x: x,
+      y: y,
+      size: current,
+      font: font,
+      color: state.navy
+    });
+  }
+
+  // Cut a logical line down until it plus an ellipsis fits maxWidth.
+  function truncateLine(text, maxWidth, size) {
+    if (measureLine(text, size) <= maxWidth) return text;
+    var chars = text.split('');
+    while (chars.length > 1) {
+      chars.pop();
+      var candidate = chars.join('').replace(/\s+$/, '') + '…';
+      if (measureLine(candidate, size) <= maxWidth) return candidate;
+    }
+    return text;
+  }
+
+  // Greedy word wrap over the available line segments at a given size.
+  // Returns null when the words do not all fit.
+  function wrapSegments(words, segments, size) {
+    var lines = [];
+    var index = 0;
+    for (var s = 0; s < segments.length && index < words.length; s += 1) {
+      var line = '';
+      while (index < words.length) {
+        var candidate = line ? line + ' ' + words[index] : words[index];
+        if (measureLine(candidate, size) <= segments[s][2]) {
+          line = candidate;
+          index += 1;
+        } else {
+          break;
+        }
+      }
+      if (line) lines.push({ segment: segments[s], text: line });
+    }
+    return index >= words.length ? lines : null;
+  }
+
+  // Draw a value across one or more line segments (page 3 address), choosing
+  // the largest size that fits and wrapping at word boundaries.
+  function drawWrapped(page, segments, value, size, minSize) {
+    var logical = normalise(value);
+    if (!logical) return;
+    var words = logical.split(/\s+/).filter(Boolean);
+    var top = size == null ? 9 : size;
+    var floor = minSize == null ? 6.5 : minSize;
+    var lines = null;
+    var chosen = top;
+
+    for (var s = top; s >= floor; s -= 0.25) {
+      lines = wrapSegments(words, segments, s);
+      if (lines) {
+        chosen = s;
+        break;
+      }
+    }
+
+    if (!lines) {
+      // Extreme fallback: fill every segment, truncating only if a single
+      // word cannot fit on its own line.
+      chosen = floor;
+      lines = [];
+      var index = 0;
+      for (var i = 0; i < segments.length && index < words.length; i += 1) {
+        var line = '';
+        while (index < words.length) {
+          var candidate = line ? line + ' ' + words[index] : words[index];
+          if (measureLine(candidate, chosen) <= segments[i][2]) {
+            line = candidate;
+            index += 1;
+          } else {
+            break;
+          }
+        }
+        if (!line) {
+          line = truncateLine(words[index], segments[i][2], chosen);
+          index += 1;
+        }
+        lines.push({ segment: segments[i], text: line });
+      }
+      if (index < words.length && lines.length) {
+        var last = lines[lines.length - 1];
+        last.text = truncateLine(last.text + ' ' + words.slice(index).join(' '), last.segment[2], chosen);
+      }
+    }
+
+    for (var j = 0; j < lines.length; j += 1) {
+      var rendered = renderText(lines[j].text);
+      if (!rendered.text) continue;
+      var font = rendered.arabic ? state.arabicFont : state.helvetica;
+      page.drawText(rendered.text, {
+        x: lines[j].segment[0],
+        y: lines[j].segment[1],
+        size: chosen,
+        font: font,
+        color: state.navy
+      });
+    }
+  }
+
   // Draw text that is already shaped and in visual order (fixed labels).
   function drawRaw(page, x, y, text, size) {
     if (!text) return;
@@ -559,7 +696,7 @@
     drawDigits(page, t.nin, P1_NIN_X, P1_NIN_Y, P1_NIN_STEP, 18);
     draw(page, P1_TEXT.mere[0], P1_TEXT.mere[1], t.nomPrenomMere);
     draw(page, P1_TEXT.pere[0], P1_TEXT.pere[1], t.prenomPere);
-    draw(page, P1_TEXT.adresse[0], P1_TEXT.adresse[1], t.adresse);
+    drawFit(page, P1_TEXT.adresse[0], P1_TEXT.adresse[1], t.adresse, P1_ADDR_WIDTH);
     draw(page, P1_TEXT.wilaya[0], P1_TEXT.wilaya[1], wilaya);
     draw(page, P1_TEXT.code_postal[0], P1_TEXT.code_postal[1], t.codePostalWilaya);
     draw(page, P1_TEXT.telephone[0], P1_TEXT.telephone[1], t.telephone);
@@ -659,7 +796,7 @@
     var fullAddress = normalise(t.adresse);
     var postalCode = clean(t.codePostalWilaya);
     var arabicAddress = postalCode ? fullAddress + ', ' + postalCode : fullAddress;
-    draw(page, P3_TEXT.adresse[0], P3_TEXT.adresse[1], arabicAddress.slice(0, 30));
+    drawWrapped(page, P3_ADDR_LINES, arabicAddress);
 
     draw(page, P3_TEXT.telephone[0], P3_TEXT.telephone[1], t.telephone);
     draw(page, P3_TEXT.portable[0], P3_TEXT.portable[1], t.portable);
@@ -667,7 +804,7 @@
 
     draw(page, P3_TEXT.intitule_nom[0], P3_TEXT.intitule_nom[1], nom);
     draw(page, P3_TEXT.intitule_prenom[0], P3_TEXT.intitule_prenom[1], prenom);
-    draw(page, P3_TEXT.intitule_adresse[0], P3_TEXT.intitule_adresse[1], fullAddress);
+    drawWrapped(page, P3_INTITULE_ADDR_LINES, fullAddress);
     drawDigits(page, postalCode, P3_CP_X, P3_CP_Y, P3_CP_STEP, 5);
   }
 
@@ -763,7 +900,7 @@
     draw(page, P2_TEXT.date_naissance[0], P2_TEXT.date_naissance[1], dateNaissance(m.dateNaissance));
     draw(page, P2_TEXT.pays_naissance[0], P2_TEXT.pays_naissance[1], m.paysNaissance);
     drawDigits(page, m.nin, P2_NIN_X, P2_NIN_Y, P2_NIN_STEP, 18);
-    draw(page, P2_TEXT.adresse[0], P2_TEXT.adresse[1], m.adresseResidence);
+    drawFit(page, P2_TEXT.adresse[0], P2_TEXT.adresse[1], m.adresseResidence, P2_ADDR_WIDTH);
     draw(page, P2_TEXT.telephone[0], P2_TEXT.telephone[1], m.telephone);
     draw(page, P2_TEXT.portable[0], P2_TEXT.portable[1], m.portable);
     draw(page, P2_TEXT.email[0], P2_TEXT.email[1], m.email, 8);
