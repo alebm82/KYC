@@ -1,4 +1,4 @@
-﻿const form = document.getElementById('kycForm');
+const form = document.getElementById('kycForm');
 const hasMandataire = document.getElementById('hasMandataire');
 const statusMsg = document.getElementById('statusMsg');
 const submitBtn = document.getElementById('submitBtn');
@@ -124,7 +124,7 @@ document.querySelectorAll('input[name$="_revenuAutrePreciser"]').forEach(sanitiz
 const CP_EXACT_RE = /^\d{5}$/;
 const NAME_LET_RE = /^[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ\s'’.-]*$/;
 const ADDR_MIN_LENGTH = 5;
-const ADDR_MAX_LENGTH = 35;
+const ADDR_MAX_LENGTH = 60;
 
 const LETTER_STRIP_RE = /[^A-Za-zÀ-ÖØ-öø-ÿ\s'’.-]/g;
 const CP_STRIP_RE = /[^0-9]/g;
