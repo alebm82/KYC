@@ -1,0 +1,168 @@
+/* Local-only additions. Not part of the original page. */
+
+.local-captcha {
+  border: 1px dashed var(--ap-blue, #003c71);
+  background: var(--ap-blue-light, #e8f1fb);
+  color: var(--ap-blue, #003c71);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Data tools, docked in the wizard sidebar (no overlay on the form). */
+.local-tools {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border, #c8d3e0);
+  font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.local-tools-title {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted, #5c6b7f);
+  margin-bottom: 8px;
+}
+
+.local-tools-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.local-tools button {
+  flex: 1 1 auto;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ap-blue, #003c71);
+  background: #fff;
+  border: 1.5px solid var(--ap-blue, #003c71);
+  border-radius: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.local-tools button:hover {
+  background: var(--ap-blue-light, #e8f1fb);
+}
+
+.local-tools button:active {
+  transform: translateY(1px);
+}
+
+.local-tools button.danger {
+  color: #a01818;
+  border-color: #c24747;
+}
+
+.local-tools button.danger:hover {
+  background: #fdecec;
+}
+
+.local-tools-note {
+  margin-top: 8px;
+  font-size: 10.5px;
+  line-height: 1.45;
+  color: var(--muted, #5c6b7f);
+}
+
+.local-tools .saved {
+  display: block;
+  min-height: 13px;
+  margin-top: 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #1f7a4d;
+}
+
+.footer-credit,
+.footer-note {
+  flex-basis: 100%;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.footer-credit {
+  color: #fff;
+  font-weight: 600;
+}
+
+.footer-note {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+/* Fallback if the wizard sidebar is ever missing. */
+.local-tools-floating {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 60;
+  width: 250px;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid var(--border, #c8d3e0);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 44, 87, 0.18);
+}
+
+/* On short screens the sidebar (steps + data tools) may be taller than the
+   viewport: let it scroll internally instead of hiding its bottom. */
+@media (min-width: 901px) {
+  .wizard-nav {
+    max-height: calc(100vh - 128px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+
+  .wizard-nav::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .wizard-nav::-webkit-scrollbar-thumb {
+    background: #c8d3e0;
+    border-radius: 3px;
+  }
+}
+
+@media (max-width: 900px) {
+  .local-tools {
+    grid-column: 1 / -1;
+    margin-top: 2px;
+    padding-top: 10px;
+  }
+
+  .local-tools-title,
+  .local-tools-note,
+  .local-tools .saved {
+    display: none;
+  }
+
+  .local-tools-row {
+    justify-content: flex-end;
+  }
+
+  .local-tools button {
+    flex: 0 0 auto;
+    padding: 6px 10px;
+  }
+
+  .local-tools-floating {
+    left: auto;
+    right: 12px;
+    bottom: 12px;
+  }
+}
+
+@media print {
+  .local-tools {
+    display: none !important;
+  }
+}

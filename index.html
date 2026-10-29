@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title data-i18n="page.title">KYC | Fiche de Connaissance Client</title>
+<link rel="icon" type="image/png" href="./01_files/logo-round.png">
+<link rel="stylesheet" href="./01_files/style.css?v=2">
+<link rel="stylesheet" href="./01_files/wizard.css?v=2">
+<link rel="stylesheet" href="./01_files/local.css?v=4">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="navbar">
+    <a class="navbar-brand" href="https://ccpnet.poste.dz/">
+      <img class="brand-logo" src="./01_files/logo-round.png" alt="Algérie Poste" width="64" height="64">
+      <span class="brand-text">
+        <span class="brand-name">KYC</span>
+        <span class="brand-sub">Algérie Poste</span>
+      </span>
+    </a>
+    <div class="lang-switcher" role="group" aria-label="Langue / اللغة">
+      <button type="button" class="lang-btn active" data-lang="fr" aria-pressed="true">FR</button>
+      <button type="button" class="lang-btn" data-lang="ar" aria-pressed="false">عربي</button>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="heading-section">
+    <h2 data-i18n="heading.h2">KYC — Fiche de Connaissance Client</h2>
+    <p data-i18n="heading.p">Compte Courant Postal · Personne Physique (CCP)</p>
+    <span class="heading-note" data-i18n="heading.note">Remplissez chaque étape puis passez à la suivante. Une section doit être complétée avant de continuer.</span>
+  </section>
+
+  <form id="kycForm" novalidate="">
+
+    <div class="wizard-layout">
+      <aside class="wizard-nav">
+        <div class="wizard-nav-title" data-i18n="nav.title">Étapes du formulaire</div>
+        <ol id="wizardList">
+          <li data-step="1" class="active visited"><span class="w-num">1</span><span data-i18n="nav.step1">Identité du client</span></li>
+          <li data-step="2" class="locked"><span class="w-num">2</span><span data-i18n="nav.step2">Situation fiscale &amp; statut</span></li>
+          <li data-step="3" class="locked"><span class="w-num">3</span><span data-i18n="nav.step3">Activité professionnelle</span></li>
+          <li data-step="4" class="locked"><span class="w-num">4</span><span data-i18n="nav.step4">Ressources &amp; objet du compte</span></li>
+          <li data-step="5" data-mandataire="" hidden="" class="locked"><span class="w-num">5</span><span data-i18n="nav.step5">Identité du mandataire</span></li>
+          <li data-step="6" data-mandataire="" hidden="" class="locked"><span class="w-num">6</span><span data-i18n="nav.step6">Situation fiscale &amp; statut</span></li>
+          <li data-step="7" data-mandataire="" hidden="" class="locked"><span class="w-num">7</span><span data-i18n="nav.step7">Activité professionnelle</span></li>
+          <li data-step="8" data-mandataire="" hidden="" class="locked"><span class="w-num">8</span><span data-i18n="nav.step8">Ressources financières</span></li>
+          <li data-step="10" data-recap="true" class="locked"><span class="w-num">≡</span><span data-i18n="nav.step10">Récapitulatif</span></li>
+          <li data-step="9" data-generate="true" class="locked"><span class="w-num">✓</span><span data-i18n="nav.step9">Génération de mes formulaires</span></li>
+        </ol>
+        <label class="toggle-mandataire wizard-toggle">
+          <input type="checkbox" id="hasMandataire" name="hasMandataire">
+          <span class="toggle-ui"></span>
+          <span data-i18n="toggle.mandataire">Mandataire</span>
+        </label>
+      </aside>
+
+      <div class="wizard-main">
+
+        <fieldset class="wizard-step-panel active" data-step="1">
+          <legend><span class="wizard-panel-legend" data-i18n="legend.1">1 · Identité du client</span></legend>
+
+          <div class="radio-row">
+            <span class="label" data-i18n="label.typeDemarche">Type de démarche :</span>
+            <label class="radio-pill"><input type="radio" name="t_ouvertureType" value="ouverture" checked=""> <span data-i18n="label.ouverture">Ouverture du compte</span></label>
+          </div>
+
+          <div class="grid4">
+            <div class="field">
+              <label data-i18n="label.wilaya">Wilaya</label>
+              <select name="t_wilaya"><option value="">Sélectionner une wilaya</option><option value="01">01 - ADRAR</option><option value="02">02 - CHLEF</option><option value="03">03 - LAGHOUAT</option><option value="04">04 - OUM EL BOUAGHI</option><option value="05">05 - BATNA</option><option value="06">06 - BEJAIA</option><option value="07">07 - BISKRA</option><option value="08">08 - BECHAR</option><option value="09">09 - BLIDA</option><option value="10">10 - BOUIRA</option><option value="11">11 - TAMANRASSET</option><option value="12">12 - TEBESSA</option><option value="13">13 - TLEMCEN</option><option value="14">14 - TIARET</option><option value="15">15 - TIZI OUZOU</option><option value="16">16 - ALGER</option><option value="17">17 - DJELFA</option><option value="18">18 - JIJEL</option><option value="19">19 - SETIF</option><option value="20">20 - SAIDA</option><option value="21">21 - SKIKDA</option><option value="22">22 - SIDI BEL ABBES</option><option value="23">23 - ANNABA</option><option value="24">24 - GUELMA</option><option value="25">25 - CONSTANTINE</option><option value="26">26 - MEDEA</option><option value="27">27 - MOSTAGANEM</option><option value="28">28 - MSILA</option><option value="29">29 - MASCARA</option><option value="30">30 - OUARGLA</option><option value="31">31 - ORAN</option><option value="32">32 - EL BAYADH</option><option value="33">33 - ILLIZI</option><option value="34">34 - BORDJ BOUARRERIDJ</option><option value="35">35 - BOUMERDES</option><option value="36">36 - EL TARF</option><option value="37">37 - TINDOUF</option><option value="38">38 - TISSEMSITL</option><option value="39">39 - EL OUED</option><option value="40">40 - KHENCHELA</option><option value="41">41 - SOUK AHRAS</option><option value="42">42 - TIPAZA</option><option value="43">43 - MILA</option><option value="44">44 - AIN DEFLA</option><option value="45">45 - NAAMA</option><option value="46">46 - AIN TEMOUCHENT</option><option value="47">47 - GHARDAIA</option><option value="48">48 - RELIZANE</option><option value="49">49 - TIMIMOUN</option><option value="50">50 - BORDJ BADJI MOKHTAR</option><option value="51">51 - OULED DJELLAL</option><option value="52">52 - BENI ABBES</option><option value="53">53 - IN SALAH</option><option value="54">54 - IN GUEZZAM</option><option value="55">55 - TOUGGOURT</option><option value="56">56 - DJANET</option><option value="57">57 - EL MEGHAIER</option><option value="58">58 - EL MENIAA</option></select>
+            </div>
+            <div class="field">
+              <label data-i18n="label.codePostalWilaya">Code postal (wilaya)</label>
+              <input type="text" name="t_codePostalWilaya" maxlength="5" readonly="" autocomplete="off" data-i18n-title="title.cpWilaya" title="Code postal de la wilaya (5 chiffres) - saisie automatique">
+            </div>
+            <div class="field">
+              <label data-i18n="label.etablissement">Nom de l'Établissement Postal</label>
+              <select name="t_etablissement">
+                <option value=""> Sélectionner un bureau de poste </option>
+              </select>
+            </div>
+            <div class="field">
+              <label data-i18n="label.codePostalEtablissement">Code Postal (établissement)</label>
+              <input type="text" name="t_codePostalEtablissement" maxlength="5" readonly="" autocomplete="off" data-i18n-title="title.cpEtab" title="Code postal de l'établissement (5 chiffres) - saisie automatique">
+            </div>
+          </div>
+
+          <div class="grid4">
+            <div class="field">
+              <label><span data-i18n="label.nom">Nom</span> <span class="req">*</span></label>
+              <input type="text" name="t_nom" required="">
+            </div>
+            <div class="field">
+              <label><span data-i18n="label.prenom">Prénom</span> <span class="req">*</span></label>
+              <input type="text" name="t_prenom" required="">
+            </div>
+            <div class="field">
+              <label data-i18n="label.dateNaissance">Date de naissance</label>
+              <input type="date" name="t_dateNaissance">
+            </div>
+            <div class="field">
+              <label><span data-i18n="label.paysNaissance">Pays de Naissance</span> <span class="req">*</span></label>
+              <input type="text" name="t_paysNaissance">
+            </div>
+          </div>
+
+          <div class="grid3">
+            <div class="field">
+              <label><span data-i18n="label.nationalite">Nationalité</span> <span class="req">*</span></label>
+              <select name="t_nationalite"><option value="Algérienne">Algérienne</option><option value="Marocaine">Marocaine</option><option value="Tunisienne">Tunisienne</option><option value="Libyenne">Libyenne</option><option value="Mauritanienne">Mauritanienne</option><option value="Malienne">Malienne</option><option value="Nigérienne">Nigérienne</option><option value="Sénégalaise">Sénégalaise</option><option value="Française">Française</option><option value="Espagnole">Espagnole</option><option value="Italienne">Italienne</option><option value="Belge">Belge</option><option value="Allemande">Allemande</option><option value="Britannique">Britannique</option><option value="Canadienne">Canadienne</option><option value="Américaine">Américaine</option><option value="Égyptienne">Égyptienne</option><option value="Syrienne">Syrienne</option><option value="Libanaise">Libanaise</option><option value="Turque">Turque</option><option value="Chinoise">Chinoise</option><option value="Malaisienne">Malaisienne</option><option value="Autre">Autre</option></select>
+            </div>
+            <div class="field">
+              <label data-i18n="label.autresNationalites">Autres nationalités</label>
+              <input type="text" name="t_autresNationalites" maxlength="60">
+            </div>
+            <div class="field">
+              <label><span data-i18n="label.nin">Numéro d'Identification National (NIN)</span> <span class="req">*</span></label>
+              <input type="text" name="t_nin">
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="field">
+              <label><span data-i18n="label.nomPrenomMere">Nom et Prénom de la Mère</span> <span class="req">*</span></label>
+              <input type="text" name="t_nomPrenomMere">
+            </div>
+            <div class="field">
+              <label><span data-i18n="label.prenomPere">Prénom du père</span> <span class="req">*</span></label>
+              <input type="text" name="t_prenomPere">
+            </div>
+          </div>
+
+          <div class="field">
+            <label><span data-i18n="label.adresse">Adresse</span> <span class="req">*</span></label>
+            <input type="text" name="t_adresse" maxlength="35" minlength="5">
+          </div>
+
+          <div class="grid3">
+            <div class="field">
+              <label data-i18n="label.telephone">N° de Téléphone</label>
+              <input type="text" name="t_telephone">
+            </div>
+            <div class="field">
+              <label data-i18n="label.portable">N° de portable</label>
+              <input type="text" name="t_portable">
+            </div>
+            <div class="field">
+              <label data-i18n="label.email">E-mail</label>
+              <input type="email" name="t_email">
+            </div>
+          </div>
+
+        </fieldset>
+
+        <fieldset class="wizard-step-panel" data-step="2">
+          <legend><span class="wizard-panel-legend" data-i18n="legend.2">2 · Situation fiscale &amp; statut particulier</span></legend>
+
+          <div class="radio-row">
+            <span class="label" data-i18n="label.residentUSA">Résident aux USA ou assujetti fiscal US ?</span>
+            <label class="radio-pill"><input type="radio" name="t_residentUSA" value="oui"> <span data-i18n="label.oui">Oui</span></label>
+            <label class="radio-pill"><input type="radio" name="t_residentUSA" value="non" checked=""> <span data-i18n="label.non">Non</span></label>
+          </div>
+          <div class="radio-row indent" id="t_fiscalFormRow" style="display:none;">
+            <span class="label" data-i18n="label.formulaireFiscal">Formulaire à renseigner :</span>
+            <label class="radio-pill"><input type="radio" name="t_formulaireFiscal" value="w8"> <span data-i18n="label.w8">W8 (non assujetti)</span></label>
+            <label class="radio-pill"><input type="radio" name="t_formulaireFiscal" value="w9"> <span data-i18n="label.w9">W9 (assujetti américain)</span></label>
+          </div>
+
+          <div class="radio-row">
+            <span class="label" data-i18n="label.ppe">Personne Politiquement/Publiquement Exposée (PPE) ?</span>
+            <label class="radio-pill"><input type="radio" name="t_ppe" value="oui"> <span data-i18n="label.oui">Oui</span></label>
+            <label class="radio-pill"><input type="radio" name="t_ppe" value="non" checked=""> <span data-i18n="label.non">Non</span></label>
+          </div>
+          <div class="field indent" id="t_raisonPPERow" style="display:none;">
+            <label data-i18n="label.raisonPPE">Si oui, raison de la classification</label>
+            <input type="text" name="t_raisonPPE" maxlength="60" autocomplete="off">
+          </div>
+
+        </fieldset>
+
+        <fieldset class="wizard-step-panel" data-step="3">
+          <legend><span class="wizard-panel-legend" data-i18n="legend.3">3 · Activité professionnelle</span></legend>
+
+          <div class="field">
+            <label data-i18n="label.profession">Profession</label>
+            <input type="text" name="t_profession" value="">
+          </div>
+
+          <div class="field">
+            <span class="label" data-i18n="label.situationPro">Situation professionnelle</span>
+            <div class="checkbox-grid" data-group="t_situationPro">
+              <label><input type="radio" name="t_situationPro" value="salarie"> <span data-i18n="opt.salarie">Salarié</span></label>
+              <label><input type="radio" name="t_situationPro" value="retraite"> <span data-i18n="opt.retraite">Retraité</span></label>
+              <label><input type="radio" name="t_situationPro" value="etudiant"> <span data-i18n="opt.etudiant">Étudiant</span></label>
+              <label><input type="radio" name="t_situationPro" value="sans_emploi"> <span data-i18n="opt.sansEmploi">Sans emploi</span></label>
+              <label><input type="radio" name="t_situationPro" value="profession_liberale"> <span data-i18n="opt.professionLiberale">Profession libérale</span></label>
+              <label><input type="radio" name="t_situationPro" value="gerant"> <span data-i18n="opt.gerant">Gérant</span></label>
+              <label><input type="radio" name="t_situationPro" value="auto_entrepreneur"> <span data-i18n="opt.autoEntrepreneur">Auto entrepreneur</span></label>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="label" data-i18n="label.natureActivite">Nature de l'activité</span>
+            <div class="checkbox-grid" data-group="t_natureActivite">
+              <label><input type="radio" name="t_natureActivite" value="ministere"> <span data-i18n="opt.ministere">Ministère et institutions publiques</span></label>
+              <label><input type="radio" name="t_natureActivite" value="entreprise_publique"> <span data-i18n="opt.entreprisePublique">Entreprise publique</span></label>
+              <label><input type="radio" name="t_natureActivite" value="entreprise_privee"> <span data-i18n="opt.entreprisePrivee">Entreprise privée</span></label>
+              <label><input type="radio" name="t_natureActivite" value="personne_physique"> <span data-i18n="opt.personnePhysique">Personne physique</span></label>
+              <label><input type="radio" name="t_natureActivite" value="organisation_non_lucratif"> <span data-i18n="opt.organisationNonLucratif">Organisation à but non lucratif</span></label>
+              <label><input type="radio" name="t_natureActivite" value="autre"> <span data-i18n="opt.autre">Autre</span></label>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="label" data-i18n="label.secteurActivite">Secteur de l'activité</span>
+            <div class="checkbox-grid" data-group="t_secteurActivite">
+              <label><input type="radio" name="t_secteurActivite" value="administration"> <span data-i18n="opt.administration">Administration publique et institutions</span></label>
+              <label><input type="radio" name="t_secteurActivite" value="industrie"> <span data-i18n="opt.industrie">Industrie</span></label>
+              <label><input type="radio" name="t_secteurActivite" value="transports_logistique"> <span data-i18n="opt.transports">Transports/logistique</span></label>
+              <label><input type="radio" name="t_secteurActivite" value="banque_assurance"> <span data-i18n="opt.banque">Banque/Assurance/institution Financière</span></label>
+              <label><input type="radio" name="t_secteurActivite" value="agriculture_peche"> <span data-i18n="opt.agriculture">Agriculture/Pêche</span></label>
+              <label><input type="radio" name="t_secteurActivite" value="construction_immobilier"> <span data-i18n="opt.construction">Construction/Bâtiment/Immobilier</span></label>
+              <label><input type="radio" name="t_secteurActivite" value="commerce_distribution"> <span data-i18n="opt.commerce">Commerce et distribution</span></label>
+              <label><input type="radio" name="t_secteurActivite" value="energie_eau"> <span data-i18n="opt.energie">Energie/Eau et Environnement</span></label>
+              <label><input type="radio" name="t_secteurActivite" value="hebergement_hotellerie"> <span data-i18n="opt.hebergement">Hébergement/Hôtellerie et restauration</span></label>
+              <label><input type="radio" name="t_secteurActivite" value="information_communication"> <span data-i18n="opt.information">Information et communication</span></label>
+              <label><input type="radio" name="t_secteurActivite" value="services"> <span data-i18n="opt.services">Services</span></label>
+            </div>
+          </div>
+
+        </fieldset>
+
+        <fieldset class="wizard-step-panel" data-step="4">
+          <legend><span class="wizard-panel-legend" data-i18n="legend.4">4 · Ressources &amp; objet du compte</span></legend>
+
+          <div class="field">
+            <span class="label"><span data-i18n="label.revenusMensuels">Revenus mensuels (DZD)</span> <span class="req">*</span></span>
+            <div class="checkbox-grid" data-group="t_revenuMensuel">
+              <label><input type="radio" name="t_revenuMensuel" value="r0_20"> <span data-i18n="opt.r0_20">De 0 à 20.000</span></label>
+              <label><input type="radio" name="t_revenuMensuel" value="r20_40"> <span data-i18n="opt.r20_40">De 20.000 à 40.000</span></label>
+              <label><input type="radio" name="t_revenuMensuel" value="r40_80"> <span data-i18n="opt.r40_80">De 40.000 à 80.000</span></label>
+              <label><input type="radio" name="t_revenuMensuel" value="r80_120"> <span data-i18n="opt.r80_120">De 80.000 à 120.000</span></label>
+              <label><input type="radio" name="t_revenuMensuel" value="r120_200"> <span data-i18n="opt.r120_200">De 120.000 à 200.000</span></label>
+              <label><input type="radio" name="t_revenuMensuel" value="r200_300"> <span data-i18n="opt.r200_300">De 200.000 à 300.000</span></label>
+              <label><input type="radio" name="t_revenuMensuel" value="plus_300"> <span data-i18n="opt.plus_300">Plus de 300.000</span></label>
+            </div>
+            <input type="text" name="t_revenuAutrePreciser" maxlength="60">
+          </div>
+
+          <div class="field">
+            <span class="label"><span data-i18n="label.objetOuverture">Objet de l'ouverture de compte</span> <span class="req">*</span></span>
+            <div class="checkbox-grid" data-group="t_objetOuverture">
+              <label><input type="radio" name="t_objetOuverture" value="reception_salaire"> <span data-i18n="opt.receptionSalaire">Réception de salaire</span></label>
+              <label><input type="radio" name="t_objetOuverture" value="reception_bourse"> <span data-i18n="opt.receptionBourse">Réception de bourse d'étude</span></label>
+              <label><input type="radio" name="t_objetOuverture" value="services_monetique"> <span data-i18n="opt.servicesMonetique">Services monétique et paiement à distance</span></label>
+              <label><input type="radio" name="t_objetOuverture" value="paiement_facture"> <span data-i18n="opt.paiementFacture">Paiement facture</span></label>
+              <label><input type="radio" name="t_objetOuverture" value="paiement_cheque"> <span data-i18n="opt.paiementCheque">Paiement par chèque</span></label>
+              <label><input type="radio" name="t_objetOuverture" value="reception_pension"> <span data-i18n="opt.receptionPension">Réception de pension et aide</span></label>
+              <label><input type="radio" name="t_objetOuverture" value="auto_entrepreneur"> <span data-i18n="opt.autoEntrepreneur">Auto entrepreneur</span></label>
+              <label><input type="radio" name="t_objetOuverture" value="autre"> <span data-i18n="opt.autre">Autre</span></label>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="label"><span data-i18n="label.origineFonds">Origine des fonds</span> <span class="req">*</span></span>
+            <div class="checkbox-grid" data-group="t_origineFonds">
+              <label><input type="radio" name="t_origineFonds" value="salaire"> <span data-i18n="opt.salaire">Salaire</span></label>
+              <label><input type="radio" name="t_origineFonds" value="benefices_activite"> <span data-i18n="opt.beneficesActivite">Bénéfices sur activité</span></label>
+              <label><input type="radio" name="t_origineFonds" value="pension_bourse"> <span data-i18n="opt.pensionBourse">Pension et bourse</span></label>
+              <label><input type="radio" name="t_origineFonds" value="retraite"> <span data-i18n="opt.retraite">Retraité</span></label>
+              <label><input type="radio" name="t_origineFonds" value="revenu_locatifs"> <span data-i18n="opt.revenuLocatifs">Revenu locatifs</span></label>
+              <label><input type="radio" name="t_origineFonds" value="dividendes"> <span data-i18n="opt.dividendes">Dividendes</span></label>
+              <label><input type="radio" name="t_origineFonds" value="aide_sociale"> <span data-i18n="opt.aideSociale">Aide sociale</span></label>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="field">
+              <label><span data-i18n="label.dateSignature">Date de signature</span> <span class="req">*</span></label>
+              <input type="date" name="t_dateSignature" min="2026-10-26">
+            </div>
+          </div>
+
+        </fieldset>
+
+        <fieldset class="wizard-step-panel" data-step="5" data-mandataire="" hidden="">
+          <legend><span class="wizard-panel-legend" data-i18n="legend.5">5 · Identité du mandataire</span></legend>
+
+          <div class="grid2">
+            <div class="radio-row">
+              <span class="label" data-i18n="label.typeDemarche">Type de démarche :</span>
+              <label class="radio-pill"><input type="radio" name="m_ouvertureType" value="ouverture" checked=""> <span data-i18n="label.ouverture">Ouverture du compte</span></label>
+            </div>
+            <div class="radio-row">
+              <span class="label" data-i18n="label.statut">Statut :</span>
+              <label class="radio-pill"><input type="radio" name="m_mandataireType" value="mandataire" checked=""> <span data-i18n="label.mandataire">Mandataire</span></label>
+            </div>
+          </div>
+
+          <div class="grid4">
+            <div class="field">
+              <label data-i18n="label.wilaya">Wilaya</label>
+              <select name="m_wilaya"><option value="">Sélectionner une wilaya</option><option value="01">01 - ADRAR</option><option value="02">02 - CHLEF</option><option value="03">03 - LAGHOUAT</option><option value="04">04 - OUM EL BOUAGHI</option><option value="05">05 - BATNA</option><option value="06">06 - BEJAIA</option><option value="07">07 - BISKRA</option><option value="08">08 - BECHAR</option><option value="09">09 - BLIDA</option><option value="10">10 - BOUIRA</option><option value="11">11 - TAMANRASSET</option><option value="12">12 - TEBESSA</option><option value="13">13 - TLEMCEN</option><option value="14">14 - TIARET</option><option value="15">15 - TIZI OUZOU</option><option value="16">16 - ALGER</option><option value="17">17 - DJELFA</option><option value="18">18 - JIJEL</option><option value="19">19 - SETIF</option><option value="20">20 - SAIDA</option><option value="21">21 - SKIKDA</option><option value="22">22 - SIDI BEL ABBES</option><option value="23">23 - ANNABA</option><option value="24">24 - GUELMA</option><option value="25">25 - CONSTANTINE</option><option value="26">26 - MEDEA</option><option value="27">27 - MOSTAGANEM</option><option value="28">28 - MSILA</option><option value="29">29 - MASCARA</option><option value="30">30 - OUARGLA</option><option value="31">31 - ORAN</option><option value="32">32 - EL BAYADH</option><option value="33">33 - ILLIZI</option><option value="34">34 - BORDJ BOUARRERIDJ</option><option value="35">35 - BOUMERDES</option><option value="36">36 - EL TARF</option><option value="37">37 - TINDOUF</option><option value="38">38 - TISSEMSITL</option><option value="39">39 - EL OUED</option><option value="40">40 - KHENCHELA</option><option value="41">41 - SOUK AHRAS</option><option value="42">42 - TIPAZA</option><option value="43">43 - MILA</option><option value="44">44 - AIN DEFLA</option><option value="45">45 - NAAMA</option><option value="46">46 - AIN TEMOUCHENT</option><option value="47">47 - GHARDAIA</option><option value="48">48 - RELIZANE</option><option value="49">49 - TIMIMOUN</option><option value="50">50 - BORDJ BADJI MOKHTAR</option><option value="51">51 - OULED DJELLAL</option><option value="52">52 - BENI ABBES</option><option value="53">53 - IN SALAH</option><option value="54">54 - IN GUEZZAM</option><option value="55">55 - TOUGGOURT</option><option value="56">56 - DJANET</option><option value="57">57 - EL MEGHAIER</option><option value="58">58 - EL MENIAA</option></select>
+            </div>
+            <div class="field">
+              <label data-i18n="label.codePostalWilaya">Code postal (wilaya)</label>
+              <input type="text" name="m_codePostalWilaya" maxlength="5" readonly="" autocomplete="off" data-i18n-title="title.cpWilaya" title="Code postal de la wilaya (5 chiffres) - saisie automatique">
+            </div>
+            <div class="field">
+              <label data-i18n="label.etablissement">Nom de l'Établissement Postal</label>
+              <select name="m_etablissement">
+                <option value=""> Sélectionner un bureau de poste </option>
+              </select>
+            </div>
+            <div class="field">
+              <label data-i18n="label.codePostalEtablissement">Code Postal (établissement)</label>
+              <input type="text" name="m_codePostalEtablissement" maxlength="5" readonly="" autocomplete="off" data-i18n-title="title.cpEtab" title="Code postal de l'établissement (5 chiffres) - saisie automatique">
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="field">
+              <label><span data-i18n="label.nomPrenomTitulaire">Nom et Prénom du Titulaire du compte</span> <span class="req">*</span></label>
+              <input type="text" name="m_nomPrenomTitulaire">
+            </div>
+            <div class="field">
+              <label><span data-i18n="label.nomPrenomMandataire">Nom et Prénom du mandataire</span> <span class="req">*</span></label>
+              <input type="text" name="m_nomPrenomMandataire">
+            </div>
+          </div>
+
+          <div class="grid3">
+            <div class="field">
+              <label data-i18n="label.dateNaissance">Date de naissance</label>
+              <input type="date" name="m_dateNaissance">
+            </div>
+            <div class="field">
+              <label><span data-i18n="label.paysNaissance">Pays de Naissance</span> <span class="req">*</span></label>
+              <input type="text" name="m_paysNaissance">
+            </div>
+            <div class="field">
+              <label><span data-i18n="label.nin">Numéro d'Identification National (NIN)</span> <span class="req">*</span></label>
+              <input type="text" name="m_nin">
+            </div>
+          </div>
+
+          <div class="field">
+            <label><span data-i18n="label.adresseResidence">Adresse au pays de résidence</span> <span class="req">*</span></label>
+            <input type="text" name="m_adresseResidence" maxlength="35" minlength="5">
+          </div>
+
+          <div class="grid3">
+            <div class="field">
+              <label data-i18n="label.telephone">N° de Téléphone</label>
+              <input type="text" name="m_telephone">
+            </div>
+            <div class="field">
+              <label data-i18n="label.portable">N° de portable</label>
+              <input type="text" name="m_portable">
+            </div>
+            <div class="field">
+              <label data-i18n="label.email">E-mail</label>
+              <input type="email" name="m_email">
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="field">
+              <label><span data-i18n="label.prenomPere">Prénom du père</span> <span class="req">*</span></label>
+              <input type="text" name="m_prenomPere">
+            </div>
+            <div class="field">
+              <label><span data-i18n="label.nomPrenomMere">Nom et Prénom de la Mère</span> <span class="req">*</span></label>
+              <input type="text" name="m_nomPrenomMere">
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="field">
+              <label><span data-i18n="label.nationalite">Nationalité</span> <span class="req">*</span></label>
+              <select name="m_nationalite"><option value="Algérienne">Algérienne</option><option value="Marocaine">Marocaine</option><option value="Tunisienne">Tunisienne</option><option value="Libyenne">Libyenne</option><option value="Mauritanienne">Mauritanienne</option><option value="Malienne">Malienne</option><option value="Nigérienne">Nigérienne</option><option value="Sénégalaise">Sénégalaise</option><option value="Française">Française</option><option value="Espagnole">Espagnole</option><option value="Italienne">Italienne</option><option value="Belge">Belge</option><option value="Allemande">Allemande</option><option value="Britannique">Britannique</option><option value="Canadienne">Canadienne</option><option value="Américaine">Américaine</option><option value="Égyptienne">Égyptienne</option><option value="Syrienne">Syrienne</option><option value="Libanaise">Libanaise</option><option value="Turque">Turque</option><option value="Chinoise">Chinoise</option><option value="Malaisienne">Malaisienne</option><option value="Autre">Autre</option></select>
+            </div>
+            <div class="field">
+              <label data-i18n="label.autresNationalites">Autres nationalités</label>
+              <input type="text" name="m_autresNationalites" maxlength="60">
+            </div>
+          </div>
+
+        </fieldset>
+
+        <fieldset class="wizard-step-panel" data-step="6" data-mandataire="" hidden="">
+          <legend><span class="wizard-panel-legend" data-i18n="legend.6">6 · Situation fiscale &amp; statut particulier</span></legend>
+
+          <div class="radio-row">
+            <span class="label" data-i18n="label.residentUSA">Résident aux USA ou assujetti fiscal US ?</span>
+            <label class="radio-pill"><input type="radio" name="m_residentUSA" value="oui"> <span data-i18n="label.oui">Oui</span></label>
+            <label class="radio-pill"><input type="radio" name="m_residentUSA" value="non" checked=""> <span data-i18n="label.non">Non</span></label>
+          </div>
+          <div class="radio-row indent" id="m_fiscalFormRow" style="display:none;">
+            <span class="label" data-i18n="label.formulaireFiscal">Formulaire à renseigner :</span>
+            <label class="radio-pill"><input type="radio" name="m_formulaireFiscal" value="w8"> <span data-i18n="label.w8">W8 (non assujetti)</span></label>
+            <label class="radio-pill"><input type="radio" name="m_formulaireFiscal" value="w9"> <span data-i18n="label.w9">W9 (assujetti américain)</span></label>
+          </div>
+
+          <div class="radio-row">
+            <span class="label" data-i18n="label.ppe">Personne Politiquement/Publiquement Exposée (PPE) ?</span>
+            <label class="radio-pill"><input type="radio" name="m_ppe" value="oui"> <span data-i18n="label.oui">Oui</span></label>
+            <label class="radio-pill"><input type="radio" name="m_ppe" value="non" checked=""> <span data-i18n="label.non">Non</span></label>
+          </div>
+          <div class="field indent" id="m_raisonPPERow" style="display:none;">
+            <label data-i18n="label.raisonPPEM">Si oui, raison de la classification comme PPE</label>
+            <input type="text" name="m_raisonPPE" maxlength="60" autocomplete="off">
+          </div>
+
+        </fieldset>
+
+        <fieldset class="wizard-step-panel" data-step="7" data-mandataire="" hidden="">
+          <legend><span class="wizard-panel-legend" data-i18n="legend.7">7 · Activité professionnelle</span></legend>
+
+          <div class="field">
+            <label data-i18n="label.profession">Profession</label>
+            <input type="text" name="m_profession">
+          </div>
+
+          <div class="field">
+            <span class="label"><span data-i18n="label.situationPro">Situation professionnelle</span> <span class="req">*</span></span>
+            <div class="checkbox-grid" data-group="m_situationPro">
+              <label><input type="radio" name="m_situationPro" value="salarie"> <span data-i18n="opt.salarie">Salarié</span></label>
+              <label><input type="radio" name="m_situationPro" value="retraite"> <span data-i18n="opt.retraite">Retraité</span></label>
+              <label><input type="radio" name="m_situationPro" value="etudiant"> <span data-i18n="opt.etudiant">Étudiant</span></label>
+              <label><input type="radio" name="m_situationPro" value="sans_emploi"> <span data-i18n="opt.sansEmploi">Sans emploi</span></label>
+              <label><input type="radio" name="m_situationPro" value="profession_liberale"> <span data-i18n="opt.professionLiberale">Profession libérale</span></label>
+              <label><input type="radio" name="m_situationPro" value="gerant"> <span data-i18n="opt.gerant">Gérant</span></label>
+              <label><input type="radio" name="m_situationPro" value="auto_entrepreneur"> <span data-i18n="opt.autoEntrepreneur">Auto entrepreneur</span></label>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="label"><span data-i18n="label.natureActivite">Nature de l'activité</span> <span class="req">*</span></span>
+            <div class="checkbox-grid" data-group="m_natureActivite">
+              <label><input type="radio" name="m_natureActivite" value="ministere"> <span data-i18n="opt.ministere">Ministère et institutions publiques</span></label>
+              <label><input type="radio" name="m_natureActivite" value="entreprise_publique"> <span data-i18n="opt.entreprisePublique">Entreprise publique</span></label>
+              <label><input type="radio" name="m_natureActivite" value="entreprise_privee"> <span data-i18n="opt.entreprisePrivee">Entreprise privée</span></label>
+              <label><input type="radio" name="m_natureActivite" value="personne_physique"> <span data-i18n="opt.personnePhysique">Personne physique</span></label>
+              <label><input type="radio" name="m_natureActivite" value="organisation_non_lucratif"> <span data-i18n="opt.organisationNonLucratif">Organisation à but non lucratif</span></label>
+              <label><input type="radio" name="m_natureActivite" value="autre"> <span data-i18n="opt.autre">Autre</span></label>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="label"><span data-i18n="label.secteurActivite">Secteur de l'activité</span> <span class="req">*</span></span>
+            <div class="checkbox-grid" data-group="m_secteurActivite">
+              <label><input type="radio" name="m_secteurActivite" value="administration"> <span data-i18n="opt.administration">Administration publique et institutions</span></label>
+              <label><input type="radio" name="m_secteurActivite" value="industrie"> <span data-i18n="opt.industrie">Industrie</span></label>
+              <label><input type="radio" name="m_secteurActivite" value="transports_logistique"> <span data-i18n="opt.transports">Transports/logistique</span></label>
+              <label><input type="radio" name="m_secteurActivite" value="banque_assurance"> <span data-i18n="opt.banque">Banque/Assurance/institution Financière</span></label>
+              <label><input type="radio" name="m_secteurActivite" value="agriculture_peche"> <span data-i18n="opt.agriculture">Agriculture/Pêche</span></label>
+              <label><input type="radio" name="m_secteurActivite" value="construction_immobilier"> <span data-i18n="opt.construction">Construction/Bâtiment/Immobilier</span></label>
+              <label><input type="radio" name="m_secteurActivite" value="commerce_distribution"> <span data-i18n="opt.commerce">Commerce et distribution</span></label>
+              <label><input type="radio" name="m_secteurActivite" value="energie_eau"> <span data-i18n="opt.energie">Energie/Eau et Environnement</span></label>
+              <label><input type="radio" name="m_secteurActivite" value="hebergement_hotellerie"> <span data-i18n="opt.hebergement">Hébergement/Hôtellerie et restauration</span></label>
+              <label><input type="radio" name="m_secteurActivite" value="information_communication"> <span data-i18n="opt.information">Information et communication</span></label>
+              <label><input type="radio" name="m_secteurActivite" value="services"> <span data-i18n="opt.services">Services</span></label>
+            </div>
+          </div>
+
+        </fieldset>
+
+        <fieldset class="wizard-step-panel" data-step="8" data-mandataire="" hidden="">
+          <legend><span class="wizard-panel-legend" data-i18n="legend.8">8 · Ressources financières</span></legend>
+
+          <div class="field">
+            <span class="label"><span data-i18n="label.revenusMensuels">Revenus mensuels (DZD)</span> <span class="req">*</span></span>
+            <div class="checkbox-grid" data-group="m_revenuMensuel">
+              <label><input type="radio" name="m_revenuMensuel" value="r0_20"> <span data-i18n="opt.r0_20">De 0 à 20.000</span></label>
+              <label><input type="radio" name="m_revenuMensuel" value="r20_40"> <span data-i18n="opt.r20_40">De 20.000 à 40.000</span></label>
+              <label><input type="radio" name="m_revenuMensuel" value="r40_80"> <span data-i18n="opt.r40_80">De 40.000 à 80.000</span></label>
+              <label><input type="radio" name="m_revenuMensuel" value="r80_120"> <span data-i18n="opt.r80_120">De 80.000 à 120.000</span></label>
+              <label><input type="radio" name="m_revenuMensuel" value="r120_200"> <span data-i18n="opt.r120_200">De 120.000 à 200.000</span></label>
+              <label><input type="radio" name="m_revenuMensuel" value="r200_300"> <span data-i18n="opt.r200_300">De 200.000 à 300.000</span></label>
+              <label><input type="radio" name="m_revenuMensuel" value="plus_300"> <span data-i18n="opt.plus_300">Plus de 300.000</span></label>
+            </div>
+            <input type="text" name="m_revenuAutrePreciser" maxlength="60">
+          </div>
+
+          <div class="grid2">
+            <div class="field">
+              <label><span data-i18n="label.dateSignature">Date de signature</span> <span class="req">*</span></label>
+              <input type="date" name="m_dateSignature" min="2026-10-26">
+            </div>
+          </div>
+
+        </fieldset>
+
+        <fieldset class="wizard-step-panel recap-panel" data-step="10" data-recap="true">
+          <legend><span class="wizard-panel-legend" data-i18n="legend.10">Récapitulatif de vos informations</span></legend>
+
+          <div class="recap-body">
+            <p class="recap-subtitle" data-i18n="recap.subtitle">Vérifiez l'ensemble de vos informations avant de générer vos formulaires. Utilisez « Précédent » pour corriger une donnée.</p>
+            <div class="recap-content" id="recapContent"></div>
+          </div>
+
+        </fieldset>
+
+        <fieldset class="wizard-step-panel generate-panel" data-step="9" data-generate="true">
+          <legend><span class="wizard-panel-legend" data-i18n="legend.9">✓ Génération de mes formulaires</span></legend>
+
+          <div class="generate-body">
+            <p class="submit-note" data-i18n="label.submitNote">Toutes les sections sont complétées. Vérifiez vos informations puis générez la fiche officielle pré-remplie au format PDF.</p>
+            <div class="captcha-box">
+              <div id="turnstileWidget" data-sitekey="0x4AAAAAAEGHJ0vv4aHFixJD"></div>
+            </div>
+            <div class="submit-row">
+              <button type="submit" id="submitBtn"><span data-i18n="label.submitBtn">Générer mes formulaires</span></button>
+              <span id="statusMsg" class=""></span>
+            </div>
+            
+            <details class="docs-collapse" id="docsCollapse">
+              <summary class="docs-collapse-summary" data-i18n="docs.title">Pièces à fournir</summary>
+              <div class="docs-collapse-body" id="docsContent"><p class="docs-cat">Pièces à fournir pour toutes les catégories de demandeurs :</p><ul><li>Une copie lisible du document officiel d'identité (biométrique ou ordinaire) en cours de validité de la personne habilitée à ouvrir le compte (demandeur ou représentant légal selon le cas) ;</li><li>Une copie lisible du document officiel d'identité (biométrique ou ordinaire) de chaque mandataire désigné ;</li><li>Original d'un justificatif de résidence récent de la personne habilitée s'il y a lieu ;</li><li>Original d'un justificatif de résidence récent pour chaque mandataire désigné.</li></ul><p class="docs-cat">Pièces spécifiques selon la catégorie de la personne (demandeur) :</p><ul><li><strong>Majeur (âgé de 19 ans ou plus) :</strong> Aucune pièce complémentaire.</li><li><strong>Majeur protégé (personne mise sous tutelle) :</strong> Un document officiel attestant de la mise sous tutelle du demandeur.</li><li><strong>Majeur aux besoins spécifiques (nécessitant un accompagnateur) :</strong> Un document officiel de désignation de l'accompagnateur.</li><li><strong>Mineur émancipé (le demandeur est le mineur lui-même) :</strong> Une copie du procès-verbal d'émancipation délivré par le juge.</li><li><strong>Mineur non émancipé (âgé de moins de 19 ans) – le dossier doit être déposé par son représentant légal :</strong> Dans ce cas, la « personne habilitée » mentionnée ci-dessus est le représentant légal (ses pièces d'identité et de résidence sont donc exigées à la place de celles du mineur).<br>Pièce complémentaire : un justificatif de la qualité de représentant légal (fiche d'état civil ou jugement de tutelle).</li></ul></div>
+            </details>
+          </div>
+
+        </fieldset>
+
+        <div class="wizard-buttons">
+          <button type="button" id="prevBtn" class="btn-outline" disabled=""><span data-i18n="label.prev">← Précédent</span></button>
+          <span id="stepMsg" class=""></span>
+          <button type="button" id="nextBtn" class="btn-wizard-next"><span data-i18n="label.next">Suivant →</span></button>
+        </div>
+
+      </div>
+    </div>
+
+
+  </form>
+</main>
+
+<footer>
+  <div class="mini-footer">
+    <p class="footer-credit" dir="rtl" lang="ar">تعديل وتهيئة : محمد أيوب عالب - مكتب بريد عين الصحراء - تقرت</p>
+    <p class="footer-note" dir="rtl" lang="ar">هذا التطبيق لتسهيل ملء وثائق فتح الحساب البريدي لدى بريد الجزائر ولا يعتبر تطبيقا رسميا</p>
+  </div>
+</footer>
+
+<!-- Bundled data (base64 / JSON) so the app also runs from file:// in Electron. -->
+<script src="./data/bureaux.js"></script>
+<script src="./data/template.js"></script>
+<script src="./data/arabic-font.js"></script>
+<script src="./data/ch6.js"></script>
+
+<!-- PDF generation: pdf-lib + fontkit, bidi reordering, Arabic reshaping. -->
+<script src="./01_files/vendor/pdf-lib.min.js"></script>
+<script src="./01_files/vendor/fontkit.umd.min.js"></script>
+<script src="./01_files/vendor/bidi.min.js"></script>
+<script src="./01_files/vendor/arabic-shaper.js"></script>
+
+<script src="./01_files/offline.js?v=6"></script>
+<script src="./01_files/i18n.js?v=4"></script>
+<script src="./01_files/pdfgen.js?v=2"></script>
+<script src="./01_files/wizard.js?v=5"></script>
+
+
+</body></html>
