@@ -1,0 +1,244 @@
+# KYC — Fiche de Connaissance Client (Algérie Poste CCP)
+
+## What this repository is
+
+A **100% static, offline-first web application** that lets a client fill in the
+Algérie Poste "Connaissance Client" (KYC) wizard for opening a **Compte Courant
+Postal (CCP)**, then generates the official pre-filled PDF **entirely in the
+browser**. There is no backend, no API, no build step and no package manager.
+
+Generated PDF = the official 4-page Algérie Poste template with user values
+drawn on top (page 2, the mandataire/signataire sheet, is removed when no
+mandataire is filled in) plus the 1-page Arabic CH6 withdrawal-authorisation
+form appended as the last page.
+
+The UI is bilingual **French (LTR) / Arabic (RTL)**; the language choice is
+persisted in `localStorage` under the key `kyc_lang`.
+
+## Repository layout
+
+```
+index.html                 All markup + form fields (~568 lines). Single page.
+01_files/
+  wizard.js                Core wizard logic: step navigation, validation,
+                           recap, payload collection, submit -> PDF download.
+  pdfgen.js                Client-side PDF generator (pdf-lib overlay engine).
+  offline.js               Local offline layer: Turnstile stub, autosave to
+                           localStorage, Export/Import/Reset JSON toolbar.
+  i18n.js                  FR + AR dictionaries, global `t()` / `currentLang()`.
+  style.css                Base layout, Algérie Poste branding, CSS variables.
+  wizard.css               Wizard shell, step panels, nav, buttons, responsive.
+  local.css                Additions from the offline layer (stub, toolbar).
+  logo-round.png           Logo.
+  vendor/                  Third-party bundles, committed as-is:
+    pdf-lib.min.js           pdf-lib 1.17.1
+    fontkit.umd.min.js       @pdf-lib/fontkit 1.1.1
+    bidi.min.js              bidi-js 1.1.0
+    arabic-shaper.js         arabic-persian-reshaper 1.0.1
+data/                      Generated assets, committed as-is (do not hand-edit):
+  template.js               window.KYC_TEMPLATE_PDF_BASE64 (4-page official form)
+  ch6.js                    window.KYC_CH6_PDF_BASE64 (1-page Arabic CH6 form)
+  arabic-font.js            window.KYC_ARABIC_FONT_BASE64 (Amiri Regular TTF)
+  bureaux.js                window.KYC_BUREAUX (wilaya -> offices + postal codes)
+licenses/                  Third-party licence texts (see licenses/README.md).
+```
+
+There is **no `package.json`, no test suite, no linter, no bundler and no CI**.
+Everything is plain JavaScript loaded with `<script>` tags.
+
+## How to run / verify a change
+
+- Fastest: open `/workspace/index.html` directly (`file://`). The app is
+  explicitly designed to work from `file://` — that is why all data is bundled.
+- Safer for script/`localStorage` behaviour: serve the folder over HTTP, e.g.
+  `python3 -m http.server 8000` from `/workspace`, then open
+  `http://localhost:8000/`.
+- Validate by walking the wizard: fill step 1, advance through every step,
+  optionally toggle "Mandataire", reach the recap, submit, and confirm that a
+  `KYC_<name>.pdf` downloads and opens with the correct pages.
+- Browsers restrict `file://` + `localStorage` in some configurations; if
+  autosave misbehaves during testing, use the HTTP server.
+
+## Load order and global contracts
+
+`index.html` loads, **in this order**:
+
+1. `data/bureaux.js`, `data/template.js`, `data/arabic-font.js`, `data/ch6.js`
+   (define the `window.KYC_*` globals)
+2. `vendor/pdf-lib.min.js`, `vendor/fontkit.umd.min.js`, `vendor/bidi.min.js`,
+   `vendor/arabic-shaper.js` (define `window.PDFLib`, `window.fontkit`,
+   `window.bidi_js`, `window.ArabicShaper`)
+3. `offline.js`, `i18n.js`, `pdfgen.js`, `wizard.js`
+
+Cross-file contracts:
+
+- `window.KYC_PDF.build(payload, bureaux)` -> `Promise<Blob>` (pdfgen.js).
+- `window.KYC_PDF._internals` -> helpers exposed for tests/asset generation.
+- `window.KYC_BUREAUX`, `window.KYC_TEMPLATE_PDF_BASE64`,
+  `window.KYC_CH6_PDF_BASE64`, `window.KYC_ARABIC_FONT_BASE64` (data files).
+- `t(key, vars?)` and `currentLang()` (i18n.js), plus `window.__KYC_LANG__`
+  (`'fr'` | `'ar'`).
+- `window.setLang(lang)` is defined in wizard.js; offline.js wraps it so its
+  own toolbar labels stay in sync.
+- `window.turnstile` is a **local stub** installed by offline.js (no network).
+
+## Form field naming convention (important)
+
+Every field is prefixed by owner:
+
+- `t_*` -> **titulaire** (account holder), steps 1-4.
+- `m_*` -> **mandataire** (representative / signatory), steps 5-8.
+- `hasMandataire` (checkbox) reveals/hides the `[data-mandataire]` steps.
+
+`wizard.js#collect(prefix)` strips the prefix and builds the payload objects
+`{ titulaire, mandataire }`. Rules:
+
+- text/email inputs: trimmed value, only when non-empty;
+- `type="date"`: stored as `DD/MM/YYYY` via `formatDate`;
+- `<select>`: value when non-empty;
+- radios: the checked value;
+- checkboxes: gathered into an **array** under the key, because some groups
+  allow several values (e.g. `t_origineFonds`);
+- `nomPrenom` for the titulaire is recomputed from `nom` + `prenom`; order is
+  given-name-first for Arabic text and family-name-first for Latin text.
+
+Steps 1-4 = `t`, steps 5-8 = `m`. `maxStep()` is `10` with a mandataire,
+otherwise `6`. Beware the two numbering systems: the HTML attributes are
+`data-step="10" data-recap="true"` and `data-step="9" data-generate="true"`,
+but the runtime `current` counter uses `maxStep() - 1` for the recap and
+`maxStep()` for the generate panel (9/10 with a mandataire, 5/6 without).
+`render()` matches recap/generate panels by their `data-recap` / `data-generate`
+flags, not by `data-step`.
+
+Field names in use (see `grep -o 'name="[^"]*"' index.html`):
+`wilaya, codePostalWilaya, etablissement, codePostalEtablissement, ouvertureType,
+nom, prenom, dateNaissance, paysNaissance, nationalite, autresNationalites, nin,
+nomPrenomMere, prenomPere, adresse / adresseResidence, telephone, portable,
+email, residentUSA, formulaireFiscal, ppe, raisonPPE, profession, situationPro,
+natureActivite, secteurActivite, revenuMensuel, revenuAutrePreciser,
+objetOuverture, origineFonds, dateSignature`, plus mandataire-only
+`nomPrenomTitulaire, nomPrenomMandataire, mandataireType`.
+
+## PDF generation (01_files/pdfgen.js)
+
+- IIFE exporting `window.KYC_PDF`, written in **ES5 style** (`var`, `function`);
+  it must stay compatible with the bundled pdf-lib/fontkit APIs.
+- `build(payload, bureaux)`: loads the template with pdf-lib and registers
+  fontkit; embeds Helvetica + Amiri (**shaping is disabled** for Amiri because
+  text is already shaped — `disableShaping`); paints page 1 (titulaire), page 2
+  (mandataire, only if `hasContent`), page 3 (Arabic request page) and page 4;
+  removes page 2 when there is no mandataire; copies the CH6 page from
+  `KYC_CH6_PDF_BASE64` and fills it; clears metadata; saves and returns a `Blob`.
+- Latin text uses Helvetica (WinAnsi-safe: unsupported chars become `?`).
+  Arabic text is reshaped and bidi-reordered, then drawn right-aligned in Amiri.
+- Coordinate tables (`P1_TEXT`, `P1_CHECK`, `P2_*`, `CH6_FIELDS`, ...) are
+  positions measured from the official template. Changing them requires visual
+  verification against the produced PDF.
+- Reusable helpers: `clean`, `normalise`, `renderText`, `drawFit`, `drawWrapped`,
+  `drawDigits`, `dateValue`, `dateNaissance`, `fullName`, `splitName`,
+  `bureauLookup`, `wilayaName`, `hasContent`.
+
+## Validation (01_files/wizard.js)
+
+- Per-step `validateStep(step)` returns a translated validation message
+  (empty string = valid). It runs on "Suivant" and again over all steps on submit.
+- `validateIdentite(prefix)` holds the shared field-format rules.
+- Regexes live together mid-file: `EMAIL_RE`, `NIN_RE` (exactly 18 digits),
+  `PHONE_RE`, `TEXT_RE`, `PRECISER_RE`, `NAT_RE`, `AMOUNT_RE`, `CP_EXACT_RE`
+  (`^\d{5}$`), `NAME_LET_RE`, plus Arabic-aware variants (`textRe()`,
+  `precisierRe()`, `natRe()`, `wilayaEtabRe()`).
+- Addresses: 5-60 characters (`ADDR_MIN_LENGTH` / `ADDR_MAX_LENGTH`).
+- Mobile numbers: exactly 10 digits starting with `05`, `06` or `07`.
+- The signature date must equal **today** (past and future dates are rejected).
+- Real-time sanitising runs on `input` (strips disallowed characters); the
+  `is-valid` / `is-invalid` classes are toggled via `markField`.
+
+## Internationalisation (01_files/i18n.js)
+
+- `I18N = { fr: {...}, ar: {...} }` with flat dotted keys (e.g.
+  `'validation.invalidNin'`).
+- `t(key, vars)` falls back to `fr`, then to the key itself; `{name}`-style
+  placeholders are substituted from `vars`.
+- Markup is translated through `data-i18n="key"` (textContent) and
+  `data-i18n-title="key"` (title attribute); `wizard.js#applyLang()` applies them.
+- RTL: `setLang('ar')` sets `document.documentElement.dir = 'rtl'` and
+  `lang = 'ar'`; `wizard.css` / `style.css` handle the mirrored layout.
+- **Any new user-visible string must be added to BOTH `fr` and `ar`** (and to a
+  `data-i18n` attribute if it lives in HTML). Validation labels are mapped in
+  `FIELD_LABEL_KEYS`; option values in `VALUE_LABELS` / `VALUE_OPT_KEYS`
+  (`valueLabel()`), which also does a camelCase fallback
+  (`opt.sans_emploi` -> `opt.sansEmploi`).
+
+## Offline layer (01_files/offline.js)
+
+- Replaces Cloudflare Turnstile with a local stub that always returns the token
+  `'local-offline'`, so wizard.js's captcha check passes.
+- Autosaves the whole form to `localStorage['ccpnet_kyc_state_v1']` (debounced,
+  ~400 ms) and restores it on load, including re-populating the
+  wilaya/etablissement selects and replaying `change` events. Legacy states that
+  stored only `t_nomPrenom` are migrated by `migrateState`/`splitLegacyName`.
+- Injects a "Mes données" toolbar (Export JSON / Import JSON / Effacer) into
+  `.wizard-nav`, with FR/AR labels. "Effacer" clears storage but preserves
+  `kyc_lang`, then reloads the page.
+
+## Content-Security-Policy (index.html <meta>)
+
+```
+default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';
+img-src 'self' data:; font-src 'self' data:; connect-src 'none';
+object-src 'none'; base-uri 'none'; form-action 'none'
+```
+
+Consequences to respect:
+
+- No inline `<script>`, no CDN URLs, no remote `fetch`/XHR, no `<form action>`.
+  All data must stay bundled under `data/`.
+- Inline `style="..."` attributes are allowed (style-src includes
+  `'unsafe-inline'`), but new inline scripts are not.
+
+## Coding conventions
+
+- Vanilla JS only — no frameworks, no modules/imports, no transpilation.
+- `wizard.js` and `i18n.js` use modern syntax (`const`, arrow functions,
+  template literals). `pdfgen.js` and `offline.js` are deliberately ES5-style
+  (`var`, `function`) — keep each file internally consistent.
+- Comments and identifiers are in **English**; user-facing text is
+  **French/Arabic**.
+- 2-space indentation, single quotes, semicolons.
+- Reuse existing helpers instead of duplicating regexes or drawing utilities.
+- Do not reformat or "modernise" the vendor bundles in `01_files/vendor/`.
+- Do not hand-edit the generated `data/*.js` files (they carry a "Generated by
+  tools/embed-assets.js ... Do not edit by hand" banner; that tool is not
+  present in this repository).
+
+## Caching / version bump rule (easy to miss)
+
+Assets are referenced with cache-busting query strings in `index.html`, e.g.
+`style.css?v=2`, `local.css?v=4`, `offline.js?v=6`, `i18n.js?v=5`,
+`pdfgen.js?v=4`, `wizard.js?v=6`. **When you edit one of these files, bump its
+`?v=` number in `index.html`** so browsers reload the changed file. Commit
+history shows this is the established practice.
+
+## Common tasks checklist
+
+- **New form field**: add markup in the correct `data-step` fieldset with the
+  `t_`/`m_` prefix -> add `data-i18n` labels and keys in both languages -> add
+  validation (regex set / `validateStep` / `validateIdentite`) -> add the field
+  to `recapRows()` -> it is collected automatically by `collect()` -> draw it in
+  `pdfgen.js` with a coordinate entry -> bump `?v=` for every edited asset.
+- **New validation rule**: add the regex next to the other regexes, return a
+  message, and add the corresponding key to FR + AR.
+- **New PDF text position**: add the payload key, a coordinate constant next to
+  the related `P*_TEXT` table, and a `draw`/`drawFit`/`drawDigits` call in the
+  right `paint*` function.
+- **New language**: extend `I18N`, update `setLang`/`applyLang`, the
+  `.lang-btn` buttons, and the `dir` handling.
+
+## Do not
+
+- Add network calls, analytics, CDN dependencies or a build pipeline without an
+  explicit request — the app is intentionally offline and CSP-locked.
+- Change PDF coordinates without visually checking the generated PDF.
+- Break the `t_`/`m_` field-prefix convention: `collect()`, `validateStep()`,
+  autosave and the recap all depend on it.
+- Remove the Turnstile stub: the submit handler still requires a token.
