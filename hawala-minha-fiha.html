@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0755a0">
+  <meta name="description" content="حاسبة حقوق الدفع ومبلغ الحوالة البريدية.">
+  <title>حوالة منها فيها (مختومة)</title>
+
+  <!-- أيقونة مدمجة داخل الصفحة؛ لا تحتاج إلى ملف خارجي -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%230755a0'/%3E%3Crect x='10' y='17' width='44' height='31' rx='5' fill='white'/%3E%3Cpath d='M12 20l20 16 20-16' fill='none' stroke='%230755a0' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='47' cy='47' r='12' fill='%23ffc20e' stroke='%230755a0' stroke-width='2'/%3E%3Cpath d='M41 47l4 4 8-9' fill='none' stroke='%230755a0' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+  <style>
+    :root {
+      color-scheme: light;
+      --blue: #0755a0;
+      --blue-dark: #063b70;
+      --gold: #ffc20e;
+      --ink: #17324f;
+      --muted: #687b90;
+      --line: #dce6f0;
+      --surface: #ffffff;
+      --page: #eef3f8;
+      --green: #087a50;
+      --red: #b42318;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 24px 16px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(7,85,160,.08), transparent 30%),
+        radial-gradient(circle at 90% 90%, rgba(255,194,14,.10), transparent 28%),
+        var(--page);
+      color: var(--ink);
+      font-family: Tahoma, Arial, sans-serif;
+    }
+
+    .app {
+      width: min(100%, 560px);
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid rgba(7,85,160,.10);
+      border-radius: 22px;
+      box-shadow: 0 18px 55px rgba(20,48,80,.13);
+    }
+
+    .header {
+      position: relative;
+      padding: 28px 22px 25px;
+      text-align: center;
+      color: white;
+      background: linear-gradient(125deg, var(--blue-dark), var(--blue) 70%, #0873c9);
+    }
+
+    .header::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: 5px;
+      background: var(--gold);
+    }
+
+    .brand-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 10px;
+      display: grid;
+      place-items: center;
+      color: var(--blue-dark);
+      background: var(--gold);
+      border: 3px solid rgba(255,255,255,.75);
+      border-radius: 17px;
+    }
+
+    .brand-icon svg { width: 34px; height: 34px; }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(21px, 5vw, 27px);
+      line-height: 1.5;
+    }
+
+    .subtitle {
+      margin: 5px 0 0;
+      color: rgba(255,255,255,.86);
+      font-size: 13px;
+    }
+
+    main { padding: 26px; }
+
+    .field-label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .input-wrap {
+      display: flex;
+      overflow: hidden;
+      border: 2px solid #b9d2ea;
+      border-radius: 13px;
+      background: #fff;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .input-wrap:focus-within {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(7,85,160,.09);
+    }
+
+    input {
+      width: 100%;
+      min-width: 0;
+      height: 60px;
+      padding: 10px 15px;
+      border: 0;
+      outline: 0;
+      color: var(--blue-dark);
+      background: transparent;
+      direction: ltr;
+      text-align: center;
+      font: 700 27px Tahoma, Arial, sans-serif;
+    }
+
+    .currency {
+      min-width: 66px;
+      display: grid;
+      place-items: center;
+      padding: 0 12px;
+      color: white;
+      background: var(--blue);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .hint {
+      margin: 8px 2px 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .results {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 13px;
+      margin-top: 25px;
+    }
+
+    .result {
+      min-width: 0;
+      padding: 17px 13px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      text-align: center;
+    }
+
+    .result.net {
+      border: 2px solid #a9dfc4;
+      background: linear-gradient(145deg, #f1fff7, #e4f7ed);
+    }
+
+    .result.fees {
+      border: 2px solid #f0d38a;
+      background: linear-gradient(145deg, #fffaf0, #fff1cc);
+    }
+
+    .result-label {
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      line-height: 1.7;
+      font-weight: 700;
+    }
+
+    .result-value {
+      margin-top: 7px;
+      overflow-wrap: anywhere;
+      direction: ltr;
+      font-size: clamp(22px, 5vw, 29px);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      color: var(--green);
+    }
+
+    .fees .result-value { color: #956000; }
+
+    .unit {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    button {
+      min-height: 47px;
+      padding: 10px 12px;
+      border: 0;
+      border-radius: 11px;
+      cursor: pointer;
+      font: 700 13px Tahoma, Arial, sans-serif;
+      transition: transform .15s, filter .15s;
+    }
+
+    button:hover { filter: brightness(.96); }
+    button:active { transform: scale(.98); }
+    button:focus-visible { outline: 3px solid #82b8ed; outline-offset: 2px; }
+
+    .copy-net { color: white; background: var(--blue); }
+    .copy-fees { color: #704900; background: #ffdf7a; }
+
+    .message {
+      display: none;
+      margin-top: 14px;
+      padding: 11px 13px;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    .message.error { display: block; color: var(--red); background: #fff0ee; }
+    .message.success { display: block; color: var(--green); background: #eaf8f0; }
+
+    .formula {
+      margin-top: 22px;
+      padding: 14px;
+      border: 1px dashed #b9cce0;
+      border-radius: 12px;
+      background: #f7faff;
+      color: #52677e;
+      font-size: 12px;
+      line-height: 2;
+      text-align: center;
+    }
+
+    .formula strong { color: var(--blue-dark); }
+
+    footer {
+      padding: 14px 18px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 11px;
+      text-align: center;
+    }
+
+    @media (max-width: 420px) {
+      body { padding: 12px; }
+      main { padding: 19px; }
+      .results { grid-template-columns: 1fr; }
+      .result-label { min-height: auto; }
+      .result-value { font-size: 28px; }
+      .actions { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="brand-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <rect x="2.5" y="5" width="19" height="14" rx="2.5" stroke="currentColor" stroke-width="1.8"/>
+          <path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="m15.5 17 2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h1>حوالة منها فيها <span style="color:#ffc20e">(مختومة)</span></h1>
+      <p class="subtitle">حاسبة حقوق الدفع ومبلغ الحوالة</p>
+    </header>
+
+    <main>
+      <label class="field-label" for="amount">المبلغ الأصلي المراد دفعه</label>
+
+      <div class="input-wrap">
+        <input
+          id="amount"
+          type="number"
+          min="0"
+          step="0.01"
+          inputmode="decimal"
+          placeholder="0.00"
+          autocomplete="off"
+          autofocus
+          aria-describedby="amount-hint"
+        >
+        <span class="currency">دج</span>
+      </div>
+      <p class="hint" id="amount-hint">أدخل المبلغ بالدينار الجزائري، وسيتم الحساب تلقائياً.</p>
+
+      <section class="results" aria-live="polite" aria-atomic="true">
+        <div class="result net">
+          <div class="result-label">مبلغ الدفع الجديد<br>(المبلغ الذي يُكتب في الحوالة)</div>
+          <div class="result-value" id="netAmount">—</div>
+          <div class="unit">دينار جزائري</div>
+        </div>
+
+        <div class="result fees">
+          <div class="result-label">مبلغ حقوق الدفع</div>
+          <div class="result-value" id="feesAmount">—</div>
+          <div class="unit">دينار جزائري</div>
+        </div>
+      </section>
+
+      <div class="actions">
+        <button class="copy-net" id="copyNet" type="button">نسخ مبلغ الحوالة</button>
+        <button class="copy-fees" id="copyFees" type="button">نسخ حقوق الدفع</button>
+      </div>
+
+      <div class="message" id="message" role="status" aria-live="polite"></div>
+
+<!--      <div class="formula">
+        <strong>طريقة الحساب</strong><br>
+        حقوق الدفع = سقف (المبلغ الأصلي ÷ 5.000) × 12 + 18<br>
+        مبلغ الحوالة = المبلغ الأصلي − حقوق الدفع
+      </div> -->
+    </main>
+
+    <footer>حوالة منها فيها (مختومة) · أداة حسابية مستقلة - من إعداد: محمد أيوب عالب</footer>
+  </div>
+
+  <script>
+    "use strict";
+
+    const amountInput = document.getElementById("amount");
+    const netOutput = document.getElementById("netAmount");
+    const feesOutput = document.getElementById("feesAmount");
+    const message = document.getElementById("message");
+
+    // عرض المبلغ بالتنسيق الألماني: 1.000,50
+    const formatter = new Intl.NumberFormat("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+    function formatAmount(cents) {
+      return formatter.format(cents / 100);
+    }
+
+    // جميع العمليات الحسابية تتم بالسنتيم لتفادي أخطاء الكسور العشرية.
+    function calculateFees(amountCents) {
+      if (amountCents <= 0) return 0;
+
+      const bracketCount = Math.ceil(amountCents / 500000);
+      return (bracketCount * 12 + 18) * 100;
+    }
+
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className = "message " + type;
+    }
+
+    function clearMessage() {
+      message.textContent = "";
+      message.className = "message";
+    }
+
+    function calculate() {
+      clearMessage();
+
+      const rawValue = amountInput.value.trim();
+
+      if (rawValue === "") {
+        netOutput.textContent = "—";
+        feesOutput.textContent = "—";
+        return;
+      }
+
+      const amount = Number(rawValue);
+
+      if (!Number.isFinite(amount) || amount < 0) {
+        netOutput.textContent = "—";
+        feesOutput.textContent = "—";
+        showMessage("يرجى إدخال مبلغ صحيح وموجب.", "error");
+        return;
+      }
+
+      if (amount > Number.MAX_SAFE_INTEGER / 100) {
+        netOutput.textContent = "—";
+        feesOutput.textContent = "—";
+        showMessage("المبلغ المدخل أكبر من النطاق الذي يمكن حسابه بدقة.", "error");
+        return;
+      }
+
+      const amountCents = Math.round(amount * 100);
+
+      if (amountCents === 0) {
+        netOutput.textContent = formatAmount(0);
+        feesOutput.textContent = formatAmount(0);
+        return;
+      }
+
+      const feesCents = calculateFees(amountCents);
+      const netCents = amountCents - feesCents;
+
+      feesOutput.textContent = formatAmount(feesCents);
+
+      if (netCents < 0) {
+        netOutput.textContent = "غير كافٍ";
+        showMessage("المبلغ الأصلي لا يكفي لتغطية حقوق الدفع؛ أدخل مبلغاً أكبر.", "error");
+        return;
+      }
+
+      netOutput.textContent = formatAmount(netCents);
+    }
+
+    async function copyText(text) {
+      if (!text || text === "—" || text === "غير كافٍ") {
+        showMessage("لا يوجد مبلغ صالح لنسخه حالياً.", "error");
+        return;
+      }
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const temporary = document.createElement("textarea");
+          temporary.value = text;
+          temporary.style.position = "fixed";
+          temporary.style.opacity = "0";
+          document.body.appendChild(temporary);
+          temporary.select();
+
+          const copied = document.execCommand("copy");
+          temporary.remove();
+
+          if (!copied) throw new Error("Copy failed");
+        }
+
+        showMessage("تم نسخ المبلغ: " + text + " دج", "success");
+      } catch {
+        showMessage("تعذر النسخ تلقائياً؛ يمكنك تحديد المبلغ ونسخه يدوياً.", "error");
+      }
+    }
+
+    document.getElementById("copyNet").addEventListener("click", () => {
+      copyText(netOutput.textContent);
+    });
+
+    document.getElementById("copyFees").addEventListener("click", () => {
+      copyText(feesOutput.textContent);
+    });
+
+    amountInput.addEventListener("input", calculate);
+  </script>
+</body>
+</html>
